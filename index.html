@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OrderFlow</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .step { display: none; padding: 20px; }
+        .active { display: block; }
+        .product-card { border: 1px solid #ddd; padding: 15px; margin: 10px; }
+        .selected { background: #e6f3ff; }
+        .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .price {
+            font-weight: bold;
+        }
+        .desc {
+            color: #666;
+        }
+        .wishlist-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #ccc;
+            transition: all 0.3s ease;
+        }
+
+        .wishlist-icon.active {
+            color: #ff4d4d;
+            animation: heartBeat 0.3s ease;
+        }
+
+        .wishlist-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4d4d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .wishlist-popup {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .wishlist-popup.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .wishlist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .wishlist-item:last-child {
+            border-bottom: none;
+        }
+
+        .wishlist-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .wishlist-item-info {
+            flex-grow: 1;
+        }
+
+        .remove-wishlist {
+            color: #ff4d4d;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Styling untuk logo keranjang */
+        .cart-logo {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cart-logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .cart-icon {
+            width: 24px;
+            height: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        .cart-counter {
+            background: #ff4d4d;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        /* Animasi untuk notifikasi saat menambah/menghapus item */
+        @keyframes cartShake {
+            0% { transform: rotate(0); }
+            15% { transform: rotate(-5deg); }
+            30% { transform: rotate(5deg); }
+            45% { transform: rotate(-3deg); }
+            60% { transform: rotate(3deg); }
+            75% { transform: rotate(-1deg); }
+            90% { transform: rotate(1deg); }
+            100% { transform: rotate(0); }
+        }
+
+        .cart-shake {
+            animation: cartShake 0.5s ease;
+        }
+
+        /* Styling untuk icon produk */
+        .product-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-button {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+        }
+
+        .icon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .icon-button svg {
+            width: 20px;
+            height: 20px;
+            stroke: #666;
+            transition: all 0.3s ease;
+        }
+
+        .icon-button.active svg {
+            stroke: #ff4d4d;
+            fill: #ff4d4d;
+        }
+
+        .icon-button.wishlist.active {
+            background: #fff0f0;
+        }
+
+        /* Animasi untuk icon */
+        @keyframes popIn {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .icon-button.active svg {
+            animation: popIn 0.3s ease;
+        }
+
+        /* Styling untuk marquee container */
+        .marquee-container {
+            width: 100%;
+            background: linear-gradient(45deg, #2193b0, #6dd5ed);
+            overflow: hidden;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            padding: 15px 0;
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
+        }
+
+        .marquee-content {
+            display: flex;
+            animation: marquee 45s linear infinite;
+            white-space: nowrap;
+            gap: 50px;
+        }
+
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            color: white;
+            font-weight: 500;
+            padding: 8px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            margin: 0 20px;
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .marquee-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            cursor: pointer;
+        }
+
+        .marquee-item i {
+            margin-right: 12px;
+            font-size: 1.2em;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .marquee-container:hover .marquee-content {
+            animation-play-state: paused;
+        }
+
+        /* Styling untuk popup notification */
+        .promo-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 300px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .promo-notification.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .promo-detail {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .promo-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .promo-header i {
+            font-size: 1.2em;
+        }
+
+        .promo-content {
+            text-align: center;
+        }
+
+        .promo-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .promo-footer small {
+            color: #666;
+        }
+
+        .promo-btn {
+            background: #ff4d4d;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-logo" id="cartLogo">
+        <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <span class="cart-counter" id="wishlistCounter">0</span>
+    </div>
+    <div class="wishlist-popup" id="wishlistPopup">
+        <h3>Wishlist Saya</h3>
+        <div id="wishlistItems"></div>
+    </div>
+
+    <div id="step1" class="step active">
+        <h2>Pilih Baju</h2>
+        <div class="product-container">
+            <div class="product-card" data-id="kaos1" onclick="selectProduct('kaos1', 'Kaos Polos Hitam', 79000)">
+                <div class="product-icon">
+                    <button class="icon-button wishlist" onclick="toggleWishlist('kaos1', event)" title="Tambah ke Wishlist">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="product-info">
+                    <h3>Kaos Polos Hitam</h3>
+                    <p class="price">Rp 79.000</p>
+                    <p class="desc">100% Cotton Combed 30s</p>
+                </div>
+            </div>
+            <div class="product-card" data-id="kaos2" onclick="selectProduct('kaos2', 'Kaos Polos Putih', 79000)">
+                <div class="product-icon">
+                    <button class="icon-button wishlist" onclick="toggleWishlist('kaos2', event)" title="Tambah ke Wishlist">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="product-info">
+                    <h3>Kaos Polos Putih</h3>
+                    <p class="price">Rp 79.000</p>
+                    <p class="desc">100% Cotton Combed 30s</p>
+                </div>
+            </div>
+        </div>
+        <div class="marquee-container">
+            <div class="marquee-content">
+                <div class="marquee-item">
+                    <i class="fas fa-fire-alt"></i>
+                    <span>SUPER SALE! Beli 2 Gratis 1</span>
+                </div>
+                <div class="marquee-item">
+                    <i class="fas fa-tag"></i>
+                    <span>DISKON 20% untuk Pembelian Pertama</span>
+                </div>
+                <div class="marquee-item">
+                    <i class="fas fa-truck-fast"></i>
+                    <span>GRATIS ONGKIR Minimal Pembelian Rp 200.000</span>
+                </div>
+                <div class="marquee-item">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Voucher Cashback Rp 50.000</span>
+                </div>
+                <div class="marquee-item">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Member Baru Extra Diskon 10%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="step2" class="step">
+        <h2>Pilih Ukuran</h2>
+        <select id="size">
+            <option value="">Pilih ukuran...</option>
+            <option value="S">S (Small)</option>
+            <option value="M">M (Medium)</option>
+            <option value="L">L (Large)</option>
+            <option value="XL">XL (Extra Large)</option>
+        </select>
+        <button onclick="prevStep(2)">Kembali</button>
+        <button onclick="nextStep(2)">Lanjut ke Pengiriman</button>
+    </div>
+
+    <div id="step3" class="step">
+        <h2>Alamat Pengiriman</h2>
+        <input type="text" id="nama" placeholder="Nama Lengkap">
+        <input type="text" id="telepon" placeholder="No. Telepon">
+        <textarea id="alamat" placeholder="Alamat Lengkap"></textarea>
+        <button onclick="prevStep(3)">Kembali</button>
+        <button onclick="nextStep(3)">Lihat Ringkasan</button>
+    </div>
+
+    <div id="step4" class="step">
+        <h2>Ringkasan Pesanan</h2>
+        <div id="orderSummary"></div>
+        <button onclick="prevStep(4)">Kembali</button>
+        <button onclick="checkout()">Bayar Sekarang</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 

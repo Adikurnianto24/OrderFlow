@@ -1,0 +1,388 @@
+.product-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.product-card {
+    position: relative;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.wishlist-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ccc;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.wishlist-icon.active {
+    color: #ff4d4d;
+    animation: heartBeat 0.3s ease;
+}
+
+.wishlist-counter {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #ff4d4d;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 1000;
+    cursor: pointer;
+    min-width: 20px;
+    text-align: center;
+}
+
+.wishlist-popup {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 15px;
+    width: 300px;
+    z-index: 1000;
+    display: none;
+}
+
+.wishlist-popup.show {
+    display: block;
+    animation: slideIn 0.3s ease;
+}
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Styling untuk logo keranjang */
+.cart-logo {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.cart-logo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.cart-icon {
+    width: 24px;
+    height: 24px;
+    animation: bounce 2s infinite;
+}
+
+.cart-counter {
+    background: #ff4d4d;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    min-width: 20px;
+    text-align: center;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-5px);
+    }
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Animasi untuk notifikasi saat menambah/menghapus item */
+@keyframes cartShake {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(-5deg); }
+    30% { transform: rotate(5deg); }
+    45% { transform: rotate(-3deg); }
+    60% { transform: rotate(3deg); }
+    75% { transform: rotate(-1deg); }
+    90% { transform: rotate(1deg); }
+    100% { transform: rotate(0); }
+}
+
+.cart-shake {
+    animation: cartShake 0.5s ease;
+}
+
+/* Styling untuk icon produk */
+.product-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 8px;
+}
+
+.icon-button {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border: none;
+    outline: none;
+}
+
+.icon-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.icon-button svg {
+    width: 20px;
+    height: 20px;
+    stroke: #666;
+    transition: all 0.3s ease;
+}
+
+.icon-button.active svg {
+    stroke: #ff4d4d;
+    fill: #ff4d4d;
+}
+
+.icon-button.wishlist.active {
+    background: #fff0f0;
+}
+
+/* Animasi untuk icon */
+@keyframes popIn {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.icon-button.active svg {
+    animation: popIn 0.3s ease;
+}
+
+/* Styling untuk marquee container yang lebih menarik */
+.marquee-container {
+    width: 100%;
+    background: linear-gradient(45deg, #2193b0, #6dd5ed);
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 15px 0;
+    box-shadow: 0 -2px 15px rgba(0,0,0,0.1);
+}
+
+.marquee-content {
+    display: flex;
+    animation: marquee 45s linear infinite;
+    white-space: nowrap;
+    gap: 50px;
+}
+
+.marquee-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 10px 25px;
+    border-radius: 30px;
+    margin: 0 20px;
+    transition: all 0.3s ease;
+}
+
+.marquee-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+    cursor: pointer;
+}
+
+.marquee-item i {
+    margin-right: 12px;
+    font-size: 1.3em;
+    color: #fff;
+}
+
+.marquee-item:hover i {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    transform: scale(1.1);
+}
+
+.marquee-item.emoji-style {
+    font-size: 1.2em;
+}
+
+.marquee-item.emoji-style i {
+    font-style: normal;
+    margin-right: 15px;
+}
+
+/* Animasi yang lebih smooth */
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Hover effect untuk memperlambat */
+.marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .marquee-item {
+        padding: 0 30px;
+    }
+    
+    .marquee-content {
+        animation-duration: 20s;
+    }
+}
+
+/* Pastikan konten utama tidak tertutup marquee */
+body {
+    padding-bottom: 60px;
+}
+
+/* Styling untuk emoji */
+.promo-emoji {
+    margin-right: 12px;
+    font-size: 1.3em;
+}
+
+/* Memastikan font yang digunakan mendukung emoji */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, 
+                 "Helvetica Neue", Arial, sans-serif, 
+                 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.promo-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.promo-header i {
+    color: #31B7D7;  /* Sesuaikan dengan warna tema */
+    font-size: 1.5em;
+}
+
+.promo-title {
+    color: #31B7D7;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+/* Styling untuk popup notification */
+.promo-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    min-width: 300px;
+}
+
+.promo-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.promo-header i {
+    font-size: 24px;
+    color: #31B7D7;  /* Sesuaikan dengan warna tema */
+    background: rgba(49, 183, 215, 0.1);  /* Background dengan opacity */
+    padding: 10px;
+    border-radius: 50%;
+}
+
+.promo-header h4 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.promo-content {
+    color: #666;
+}
+
+.promo-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.promo-btn {
+    background: #31B7D7;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.promo-btn:hover {
+    background: #2a9eb9;
+    transform: translateY(-2px);
+}
